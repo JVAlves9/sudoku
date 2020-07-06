@@ -169,83 +169,22 @@ class Su:
             for j in range(9):
                 if self._su[i][j] !=0:
                     self._su[i][j].isFixed = True
-    def solve(self):#first solve, sometimes works, sometimes not, gets maximum recursion depth exception. I just gave up this one
-        self.__solve_rec(0,0)
-    def __solve_rec(self,x:int,y:int,count:int=0,tries:list = None):
-        if tries == None:# list of numbers tried
-            tries = []
-        r = random.randint(1,9)#number to try
-        a=0 #just a verification
-        if count == 9: #number of tries
-            temp = True
-            for a in range(1,10): #a last try passing through all numbers
-                if self.legal(a,x,y) and not(a in tries):
-                    r= a
-                    temp = False
-                    break
-            if temp: #verify if it had found the number on the loop
-                return
-        if self._su[x][y].isFixed: #if it's an already fixed number, just call the next position  
-            if x!=8:
-                self.__solve_rec(x+1,y)
-            elif x==8 and y!=8:
-                self.__solve_rec(0,y+1)
-        elif x==0 and y==0:
-            if not self.change(r,x,y):
-                self.__solve_rec(x,y)
-            else:
-                self.__solve_rec(x+1,y)
-        elif x==8 and y==8: # last number, just one possibility, so no need to return to the previous calls int he stack
-            if not self.legal(r,x,y):
-                self.__solve_rec(x,y)
-            else:
-                self._su[8][8]._value=r
-        elif x  == 8 or y==8: # just trying every number on the last space of a column or row -- not really needed tough
-            if a ==0:
-                for a in range(1,10):
-                    if self.legal(a,x,y) and not(a in tries):
-                        self._su[x][y]._value = a
-                        break
-                tries.append(self._su[x][y])
-            if self._su[x][y]==0:
-                self.__solve_rec(x,y,9,tries) #if none, return to previous calls
-            elif x == 8:
-                self.__solve_rec(0,y+1)
-            else:
-                self.__solve_rec(x+1,y)
-        else:
-            if tries !=  []:
-                if r in tries:
-                    self._su[x][y]._value=0
-                    return
-            if not self.legal(r,x,y):#see if it's legal
-                self.__solve_rec(x,y,count+1,tries)
-            else:
-                self._su[x][y]._value=r
-                tries.append(r)
-                self.__solve_rec(x+1,y)
-        if not self.verify_cells():#verify if the sudoku is already solved
-            if (self._su[x][y]==0 or self._su[x][y].isFixed) and not(x ==0 and y ==0) :#pop every call for a same position tha has reached 9 tries
-                return
-            else:
-                self._su[x][y]._value = 0
-                self.__solve_rec(x,y,count,tries)
     def verify_cells(self)->bool:
         for i in range(9):
             for j in range (9):
                 if self._su[i][j] ==0:
                     return False
         return True
-    def solve2(self):
-        self.__solve_rec2(0,0)
-    def __solve_rec2(self,x:int,y:int,tries:list = None):
+    def solve(self):
+        self.__solve_rec(0,0)
+    def __solve_rec(self,x:int,y:int,tries:list = None):
         if tries == None:# list of numbers tried
             tries = []
         if self._su[x][y].isFixed: #if it's already a fixed number, just call the next position  
             if x!=8:
-                self.__solve_rec2(x+1,y)
+                self.__solve_rec(x+1,y)
             elif x==8 and y!=8:
-                self.__solve_rec2(0,y+1)
+                self.__solve_rec(0,y+1)
         else:
             temp = True
             self._su[x][y]._value = 0
@@ -258,19 +197,19 @@ class Su:
             if temp: #verify if it had found the number on the loop
                 return
             elif x==8 and y!=8:
-                self.__solve_rec2(0,y+1)
+                self.__solve_rec(0,y+1)
             elif not(x==8 and y==8):
-                self.__solve_rec2(x+1,y)
+                self.__solve_rec(x+1,y)
         if not self.verify_cells():
             if (self._su[x][y]==0 or self._su[x][y].isFixed) and not(x ==0 and y ==0) :#pop every call for a same position tha has reached 9 tries
                 return
             else:
                 self._su[x][y]._value = 0
-                self.__solve_rec2(x,y,tries)
+                self.__solve_rec(x,y,tries)
 
 if __name__ == '__main__':
     mano = Su()
     mano.create('easy')
     print(mano)
-    mano.solve2()
+    mano.solve()
     print(mano)

@@ -1669,7 +1669,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
                 self.sqrs[f'{i}{j}'].setText('')
                 self.sqrs[f'{i}{j}'].setReadOnly(False)
     def solve_fun(self):
-        self.sudoku.solve2()
+        self.sudoku.solve()
         self.copy_sudoku_to_sudokuscreen(False)
     def make_move(self,pos):
         temp = self.sqrs[pos]
