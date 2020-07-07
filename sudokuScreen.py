@@ -1505,6 +1505,8 @@ class Ui_MainWindow(QtWidgets.QWidget):
         self.new.clicked.connect(lambda:self.switch())
         self.solve.clicked.connect(lambda:self.solve_fun())
         self.clean.clicked.connect(lambda:self.cleaning())
+        self.start_time = time.time()
+        self.end_time = 0
         self.lcdNumber.display(int(time.strftime('%H',time.localtime())))
         self.lcdNumber_2.display(int(time.strftime('%M',time.localtime())))
         self.lcdNumber_3.display(int(time.strftime('%S',time.localtime())))
@@ -1671,6 +1673,7 @@ class Ui_MainWindow(QtWidgets.QWidget):
     def solve_fun(self):
         self.sudoku.solve()
         self.copy_sudoku_to_sudokuscreen(False)
+        QtWidgets.QMessageBox.about(self,'Solved','The sudoku game was solved by the automatic solver')
     def make_move(self,pos):
         temp = self.sqrs[pos]
         palette = QtGui.QPalette()
@@ -1685,10 +1688,18 @@ class Ui_MainWindow(QtWidgets.QWidget):
                 brush = QtGui.QBrush(QtGui.QColor(240, 240, 240))
                 brush.setStyle(QtCore.Qt.SolidPattern)
                 palette.setBrush(QtGui.QPalette.Disabled, QtGui.QPalette.Base, brush)
+            elif temp.text() == '':
+                self.sudoku.change(0)
         except:
             print('Não foi número')
         finally:
-            temp.setPalette(palette)
+            if not temp.isReadOnly():
+                temp.setPalette(palette)
+            if self.sudoku.verify_cells():
+                if self.end_time == 0:
+                    self.end_time = time.time()
+                t = format_time(round(self.end_time - self.start_time))
+                QtWidgets.QMessageBox.about(self,'Solved',f'Time spent playing:{t}')
 
     
 
@@ -1708,6 +1719,14 @@ class Controller:
         self.window = Ui_MainWindow(MainWindow,name,mode)
         self.window.switch_window.connect(self.show_initial)
         MainWindow.show()
+
+def format_time(t:int):
+    c = t%60
+    if c == 0:
+        return f'{round(t/60)}:00'
+    else:
+        return f'{round(t/60)}:{c}'
+
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
